@@ -19,14 +19,20 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.log4j.Logger;
 
 public class CrystalBallPairStripe {
 
 	public static class MapProcess extends
 			Mapper<LongWritable, Text, Pair, IntWritable> {
+		
+		private Logger logger = Logger.getLogger(MapProcess.class);
 
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
+			
+			logger.info("---MAP PROCESS---");
+			
 			String line = value.toString().trim();
 			String[] chunks = line.split("\\s+");
 
@@ -43,6 +49,7 @@ public class CrystalBallPairStripe {
 	public static class ReduceProcess extends
 			Reducer<Pair, IntWritable, Text, Text> {
 
+		private Logger logger = Logger.getLogger(ReduceProcess.class);
 		private String lastKey;
 		private MapWritable mapData;
 
@@ -50,6 +57,7 @@ public class CrystalBallPairStripe {
 		protected void setup(
 				Reducer<Pair, IntWritable, Text, Text>.Context context)
 				throws IOException, InterruptedException {
+			logger.info("---REDUCE SETUP---");
 			mapData = new MapWritable();
 			lastKey = "";
 		}
@@ -57,6 +65,8 @@ public class CrystalBallPairStripe {
 		public void reduce(Pair key, Iterable<IntWritable> values,
 				Context context) throws IOException, InterruptedException {
 
+			logger.info("---REDUCE PROCESS---");
+			
 			if (!key.getKey().equals(lastKey) && !lastKey.isEmpty()) {
 				emitResult(context);
 			}
@@ -74,6 +84,7 @@ public class CrystalBallPairStripe {
 		protected void cleanup(
 				Reducer<Pair, IntWritable, Text, Text>.Context context)
 				throws IOException, InterruptedException {
+			logger.info("---REDUCE CLOSE---");
 			emitResult(context);
 		}
 		

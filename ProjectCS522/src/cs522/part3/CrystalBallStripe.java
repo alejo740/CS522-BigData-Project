@@ -19,14 +19,18 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.log4j.Logger;
 
 public class CrystalBallStripe {
 
 	public static class MapProcess extends
 			Mapper<LongWritable, Text, Text, MapWritable> {
+		
+		private Logger logger = Logger.getLogger(MapProcess.class);
 
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
+			logger.info("---MAP PROCESS---");
 			String line = value.toString().trim();
 			String[] chunks = line.split("\\s+");
 
@@ -52,10 +56,14 @@ public class CrystalBallStripe {
 
 	public static class ReduceProcess extends
 			Reducer<Text, MapWritable, Text, Text> {
+		
+		private Logger logger = Logger.getLogger(ReduceProcess.class);
 
 		public void reduce(Text key, Iterable<MapWritable> values,
 				Context context) throws IOException, InterruptedException {
 
+			logger.info("---REDUCE PROCESS---");
+			
 			MapWritable mapResult = new MapWritable();
 			for (MapWritable val : values) {
 				for (Entry<Writable, Writable> entry : val.entrySet()) {

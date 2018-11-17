@@ -1,6 +1,7 @@
 package cs522.part2;
 
 import java.io.IOException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -15,6 +16,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.log4j.Logger;
 
 public class CrystalBallPair {
 
@@ -22,9 +24,10 @@ public class CrystalBallPair {
 
 	public static class MapProcess extends
 			Mapper<LongWritable, Text, Pair, IntWritable> {
-
+		private Logger logger = Logger.getLogger(MapProcess.class);
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
+			logger.info("---MAP PROCESS---");
 			String line = value.toString().trim();
 			String[] chunks = line.split("\\s+");
 
@@ -42,17 +45,20 @@ public class CrystalBallPair {
 	public static class ReduceProcess extends
 			Reducer<Pair, IntWritable, Text, FloatWritable> {
 
+		private Logger logger = Logger.getLogger(ReduceProcess.class);
 		private float count;
 
 		@Override
 		protected void setup(
 				Reducer<Pair, IntWritable, Text, FloatWritable>.Context context)
 				throws IOException, InterruptedException {
+			logger.info("---REDUCE SETUP---");
 			count = 0;
 		}
 
 		public void reduce(Pair key, Iterable<IntWritable> values,
 				Context context) throws IOException, InterruptedException {
+			logger.info("---REDUCE PROCESS---");
 			int sum = 0;
 			for (IntWritable val : values) {
 				sum += val.get();

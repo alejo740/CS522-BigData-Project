@@ -15,23 +15,27 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.log4j.Logger;
 
 public class InMapperWordCount {
 
 	public static class MapProcess extends
 			Mapper<LongWritable, Text, Text, IntWritable> {
+		private Logger logger = Logger.getLogger(MapProcess.class);
 		private Map<Text, Integer> wordMap;
 
 		@Override
 		protected void setup(
 				Mapper<LongWritable, Text, Text, IntWritable>.Context context)
 				throws IOException, InterruptedException {
+			logger.info("---MAP SETUP---");
 			System.out.println("Mapper Initialize");
 			wordMap = new TreeMap<Text, Integer>();
 		}
 
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
+			logger.info("---MAP PROCESS---");
 			String line = value.toString();
 			StringTokenizer tokenizer = new StringTokenizer(line);
 			while (tokenizer.hasMoreTokens()) {
@@ -54,7 +58,7 @@ public class InMapperWordCount {
 		protected void cleanup(
 				Mapper<LongWritable, Text, Text, IntWritable>.Context context)
 				throws IOException, InterruptedException {
-			System.out.println("----Mapper Close----");
+			logger.info("---MAP CLOSE---");
 
 			for (Entry<Text, Integer> entry : wordMap.entrySet()) {
 				context.write(entry.getKey(), new IntWritable(entry.getValue()));
@@ -66,23 +70,34 @@ public class InMapperWordCount {
 
 	public static class ReduceProcess extends
 			Reducer<Text, IntWritable, Text, IntWritable> {
-		
+		private Logger logger = Logger.getLogger(ReduceProcess.class);
 		@Override
 		protected void setup(
 				Reducer<Text, IntWritable, Text, IntWritable>.Context context)
 				throws IOException, InterruptedException {
+			logger.info("---REDUCE SETUP---");
 			System.out.println("----Reducer Initialize----");
 			super.setup(context);
 		}
 		
 		public void reduce(Text key, Iterable<IntWritable> values,
 				Context context) throws IOException, InterruptedException {
+			logger.info("---REDUCE PROCESS---");
 			int sum = 0;
 			for (IntWritable val : values) {
 				sum += val.get();
 			}
 			context.write(key, new IntWritable(sum));
 		}
+
+		@Override
+		protected void cleanup(
+				Reducer<Text, IntWritable, Text, IntWritable>.Context context)
+				throws IOException, InterruptedException {
+			logger.info("---REDUCE CLOSE---");
+			super.cleanup(context);
+		}
+		
 	}
 
 	public static void main(String[] args) throws Exception {

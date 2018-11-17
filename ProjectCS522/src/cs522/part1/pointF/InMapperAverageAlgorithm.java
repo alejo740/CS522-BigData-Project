@@ -18,21 +18,25 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.log4j.Logger;
 
 public class InMapperAverageAlgorithm {
 	public static class MapProcess extends
 			Mapper<LongWritable, Text, Text, Pair> {
+		private Logger logger = Logger.getLogger(MapProcess.class);
 		private Map<String, Pair> wordMap;
 
 		@Override
 		protected void setup(
 				Mapper<LongWritable, Text, Text, Pair>.Context context)
 				throws IOException, InterruptedException {
+			logger.info("---MAP SETUP---");
 			wordMap = new HashMap<String, Pair>();
 		}
 
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
+			logger.info("---MAP PROCESS---");
 			String line = value.toString();
 			String[] chunks = line.split(" ");
 			String id = chunks[0];
@@ -59,6 +63,7 @@ public class InMapperAverageAlgorithm {
 		protected void cleanup(
 				Mapper<LongWritable, Text, Text, Pair>.Context context)
 				throws IOException, InterruptedException {
+			logger.info("---MAP CLOSE---");
 			for (Entry<String, Pair> entry : wordMap.entrySet()) {
 				context.write(new Text(entry.getKey()), entry.getValue());
 			}
@@ -67,9 +72,10 @@ public class InMapperAverageAlgorithm {
 
 	public static class ReduceProcess extends
 			Reducer<Text, Pair, Text, IntWritable> {
-
+		private Logger logger = Logger.getLogger(ReduceProcess.class);
 		public void reduce(Text key, Iterable<Pair> values, Context context)
 				throws IOException, InterruptedException {
+			logger.info("---REDUCE PROCESS---");
 			int sum = 0;
 			int count = 0;
 			for (Pair val : values) {
