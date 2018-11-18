@@ -25,7 +25,6 @@ public class CrystalBallStripe {
 
 	public static class MapProcess extends
 			Mapper<LongWritable, Text, Text, MapWritable> {
-		
 		private Logger logger = Logger.getLogger(MapProcess.class);
 
 		public void map(LongWritable key, Text value, Context context)
@@ -33,7 +32,6 @@ public class CrystalBallStripe {
 			logger.info("---MAP PROCESS---");
 			String line = value.toString().trim();
 			String[] chunks = line.split("\\s+");
-
 			for (int i = 0; i < chunks.length; i++) {
 				int j = i + 1;
 				MapWritable mapWindow = new MapWritable();
@@ -48,7 +46,6 @@ public class CrystalBallStripe {
 					mapWindow.put(tj, new FloatWritable(sum));
 					j++;
 				}
-
 				context.write(new Text(chunks[i]), mapWindow);
 			}
 		}
@@ -56,14 +53,11 @@ public class CrystalBallStripe {
 
 	public static class ReduceProcess extends
 			Reducer<Text, MapWritable, Text, Text> {
-		
 		private Logger logger = Logger.getLogger(ReduceProcess.class);
 
 		public void reduce(Text key, Iterable<MapWritable> values,
 				Context context) throws IOException, InterruptedException {
-
-			logger.info("---REDUCE PROCESS---");
-			
+			logger.info("---REDUCE PROCESS---");			
 			MapWritable mapResult = new MapWritable();
 			for (MapWritable val : values) {
 				for (Entry<Writable, Writable> entry : val.entrySet()) {
@@ -78,19 +72,16 @@ public class CrystalBallStripe {
 					mapResult.put(entry.getKey(), new FloatWritable(value));
 				}
 			}
-
 			float sum = 0;
 			for (Entry<Writable, Writable> entry : mapResult.entrySet()) {
 				sum += ((FloatWritable) entry.getValue()).get();
 			}
-
 			StringBuilder mapResultOutput = new StringBuilder();
 			for (Entry<Writable, Writable> entry : mapResult.entrySet()) {
 				float value = ((FloatWritable) entry.getValue()).get() / sum;
 				mapResult.put(entry.getKey(), new FloatWritable(value));
 				mapResultOutput.append("|").append(entry.getKey()).append("->").append(entry.getValue()).append("| ");
 			}
-			
 			context.write(key, new Text(mapResultOutput.toString().trim()));
 		}
 	}

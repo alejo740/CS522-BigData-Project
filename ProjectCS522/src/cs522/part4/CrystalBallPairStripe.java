@@ -25,17 +25,13 @@ public class CrystalBallPairStripe {
 
 	public static class MapProcess extends
 			Mapper<LongWritable, Text, Pair, IntWritable> {
-		
 		private Logger logger = Logger.getLogger(MapProcess.class);
 
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
-			
 			logger.info("---MAP PROCESS---");
-			
 			String line = value.toString().trim();
 			String[] chunks = line.split("\\s+");
-
 			for (int i = 0; i < chunks.length; i++) {
 				int j = i + 1;
 				while (j < chunks.length && !chunks[i].equals(chunks[j])) {
@@ -48,7 +44,6 @@ public class CrystalBallPairStripe {
 
 	public static class ReduceProcess extends
 			Reducer<Pair, IntWritable, Text, Text> {
-
 		private Logger logger = Logger.getLogger(ReduceProcess.class);
 		private String lastKey;
 		private MapWritable mapData;
@@ -64,18 +59,14 @@ public class CrystalBallPairStripe {
 
 		public void reduce(Pair key, Iterable<IntWritable> values,
 				Context context) throws IOException, InterruptedException {
-
 			logger.info("---REDUCE PROCESS---");
-			
 			if (!key.getKey().equals(lastKey) && !lastKey.isEmpty()) {
 				emitResult(context);
 			}
-			
 			float total = 0;
 			for (IntWritable val : values) {
 				total += val.get();
 			}
-			
 			mapData.put(new Text(key.getValue()), new FloatWritable(total));
 			lastKey = key.getKey();
 		}
@@ -103,7 +94,6 @@ public class CrystalBallPairStripe {
 			context.write(new Text(lastKey), new Text(mapDataString.toString().trim()));
 			mapData = new MapWritable();
 		}
-
 	}
 
 	public static void main(String[] args) throws Exception {

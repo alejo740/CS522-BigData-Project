@@ -44,7 +44,6 @@ public class CrystalBallPair {
 
 	public static class ReduceProcess extends
 			Reducer<Pair, IntWritable, Text, FloatWritable> {
-
 		private Logger logger = Logger.getLogger(ReduceProcess.class);
 		private float count;
 

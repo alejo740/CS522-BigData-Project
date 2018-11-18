@@ -44,10 +44,7 @@ public class InMapperAverageAlgorithm {
 			Integer number = 0;
 			try {
 				number = Integer.parseInt(lastChunk);
-			} catch (NumberFormatException e) {
-
-			}
-
+			} catch (NumberFormatException e) { }
 			Pair p = null;
 			if (!wordMap.containsKey(id)) {
 				p = new Pair(number, 1);

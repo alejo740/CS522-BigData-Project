@@ -29,10 +29,8 @@ public class InMapperWordCount {
 				Mapper<LongWritable, Text, Text, IntWritable>.Context context)
 				throws IOException, InterruptedException {
 			logger.info("---MAP SETUP---");
-			System.out.println("Mapper Initialize");
 			wordMap = new TreeMap<Text, Integer>();
 		}
-
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 			logger.info("---MAP PROCESS---");
@@ -40,18 +38,14 @@ public class InMapperWordCount {
 			StringTokenizer tokenizer = new StringTokenizer(line);
 			while (tokenizer.hasMoreTokens()) {
 				String token = tokenizer.nextToken();
-
 				Text word = new Text();
 				word.set(token);
-
-				System.out.println(token);
 				if (!wordMap.containsKey(word)) {
 					wordMap.put(word, 1);
 				} else {
 					wordMap.put(word, wordMap.get(word) + 1);
 				}
 			}
-
 		}
 
 		@Override
@@ -59,13 +53,10 @@ public class InMapperWordCount {
 				Mapper<LongWritable, Text, Text, IntWritable>.Context context)
 				throws IOException, InterruptedException {
 			logger.info("---MAP CLOSE---");
-
 			for (Entry<Text, Integer> entry : wordMap.entrySet()) {
 				context.write(entry.getKey(), new IntWritable(entry.getValue()));
 			}
-
 		}
-
 	}
 
 	public static class ReduceProcess extends
@@ -76,7 +67,6 @@ public class InMapperWordCount {
 				Reducer<Text, IntWritable, Text, IntWritable>.Context context)
 				throws IOException, InterruptedException {
 			logger.info("---REDUCE SETUP---");
-			System.out.println("----Reducer Initialize----");
 			super.setup(context);
 		}
 		
@@ -97,7 +87,6 @@ public class InMapperWordCount {
 			logger.info("---REDUCE CLOSE---");
 			super.cleanup(context);
 		}
-		
 	}
 
 	public static void main(String[] args) throws Exception {

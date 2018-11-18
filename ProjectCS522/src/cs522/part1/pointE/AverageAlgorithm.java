@@ -21,37 +21,15 @@ import org.apache.log4j.Logger;
 public class AverageAlgorithm {
 	public static class MapProcess extends
 			Mapper<LongWritable, Text, Text, IntWritable> {
-		private Logger logger = Logger.getLogger(MapProcess.class);
+		private Logger logger = Logger.getLogger(MapProcess.class);		
 		
-		
-		
-		@Override
-		protected void cleanup(
-				Mapper<LongWritable, Text, Text, IntWritable>.Context context)
-				throws IOException, InterruptedException {
-			logger.info("---MAP CLOSE---");
-			super.cleanup(context);
-		}
-
-
-
-		@Override
-		protected void setup(
-				Mapper<LongWritable, Text, Text, IntWritable>.Context context)
-				throws IOException, InterruptedException {
-			logger.info("---MAP SETUP---");
-			super.setup(context);
-		}
-
-
-
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 			logger.info("---MAP PROCESS---");
 			String line = value.toString();
 			String[] chunks = line.split(" ");
 			String id = chunks[0];			
-			String lastChunk = chunks[chunks.length-1];			
+			String lastChunk = chunks[chunks.length-1];
 			Integer number = 0;
 			try {
 				number = Integer.parseInt(lastChunk);
@@ -66,22 +44,6 @@ public class AverageAlgorithm {
 	public static class ReduceProcess extends
 			Reducer<Text, IntWritable, Text, IntWritable> {
 		private Logger logger = Logger.getLogger(ReduceProcess.class);
-		
-		@Override
-		protected void cleanup(
-				Reducer<Text, IntWritable, Text, IntWritable>.Context context)
-				throws IOException, InterruptedException {
-			logger.info("---REDUCE CLOSE---");
-			super.cleanup(context);
-		}
-
-		@Override
-		protected void setup(
-				Reducer<Text, IntWritable, Text, IntWritable>.Context context)
-				throws IOException, InterruptedException {
-			logger.info("---REDUCE SETUP---");
-			super.setup(context);
-		}
 
 		public void reduce(Text key, Iterable<IntWritable> values,
 				Context context) throws IOException, InterruptedException {
